@@ -99,16 +99,17 @@ if (isset($_GET['logout'])) {
             padding: 0;
         }
         .sidebar {
-            background: #2c3e50;
+            background: #F5F5F5;
             height: 100vh;
             width: 350px;
-            color: white;
+            color: #333;
             overflow-y: auto;
             position: fixed;
             top: 0;
             left: 0;
             z-index: 1000;
             transition: transform 0.3s ease;
+            border-right: 1px solid #ddd;
         }
         
         .sidebar.hidden {
@@ -116,13 +117,15 @@ if (isset($_GET['logout'])) {
         }
         
         .main-content {
-            background: #f8f9fa;
+            background: #F5F5F5;
             min-height: 100vh;
             margin-left: 350px;
             transition: margin-left 0.3s ease;
             width: calc(100vw - 350px);
             overflow-x: hidden;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
         
         .main-content.sidebar-hidden {
@@ -176,16 +179,104 @@ if (isset($_GET['logout'])) {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
         }
-        /* Tab navigation container */
-        .tab-navigation {
+        /* Main application tabs (Notebook, Dashboard, Activate) */
+        .app-tabs {
             display: flex;
             align-items: center;
-            background: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            width: 100%;
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 0 20px;
+            height: 50px;
         }
         
-        .tab-scroll-container {
+        .app-tab {
+            padding: 12px 20px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        
+        .app-tab.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+        
+        .app-tab:hover {
+            color: #007bff;
+        }
+        
+        /* Action buttons container */
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #dee2e6;
+            background: white;
+            color: #6c757d;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+        }
+        
+        .action-btn.primary {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .action-btn.primary:hover {
+            background: #0056b3;
+        }
+        
+        /* SQL query display */
+        .sql-query-container {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 15px 20px;
+        }
+        
+        .sql-query {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.875rem;
+            color: #495057;
+        }
+        
+        .sql-query select {
+            border: none;
+            background: transparent;
+            color: #007bff;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        /* Table tabs navigation */
+        .table-tabs-navigation {
+            display: flex;
+            align-items: center;
+            background: #F5F5F5;
+            border-bottom: 1px solid #dee2e6;
+            height: 40px;
+        }
+        
+        .table-tabs-scroll {
             display: flex;
             align-items: center;
             flex: 1;
@@ -193,14 +284,14 @@ if (isset($_GET['logout'])) {
             position: relative;
         }
         
-        .tab-scroll-wrapper {
+        .table-tabs-wrapper {
             display: flex;
             align-items: center;
             transition: transform 0.3s ease;
             min-width: 100%;
         }
         
-        .nav-tabs {
+        .table-tabs {
             display: flex;
             align-items: center;
             margin: 0;
@@ -210,92 +301,78 @@ if (isset($_GET['logout'])) {
             min-width: 100%;
         }
         
-        .nav-tabs .nav-item {
+        .table-tabs .tab-item {
             flex-shrink: 0;
             margin-right: 2px;
         }
         
-        .nav-tabs .nav-link {
+        .table-tabs .tab-link {
             border: none;
-            border-radius: 8px 8px 0 0;
+            border-radius: 4px 4px 0 0;
             background: #e9ecef;
             color: #6c757d;
             white-space: nowrap;
-            max-width: 200px;
+            max-width: 180px;
             overflow: hidden;
             text-overflow: ellipsis;
             display: flex;
             align-items: center;
-            padding: 8px 12px;
+            padding: 6px 12px;
             font-size: 0.875rem;
+            height: 32px;
         }
         
-        .nav-tabs .nav-link.active {
+        .table-tabs .tab-link.active {
             background: #007bff;
             color: white;
         }
         
-        .nav-tabs .nav-link .close-tab {
-            margin-left: 8px;
+        .table-tabs .tab-link .close-tab {
+            margin-left: 6px;
             opacity: 0.7;
             cursor: pointer;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1rem;
             line-height: 1;
         }
         
-        .nav-tabs .nav-link .close-tab:hover {
+        .table-tabs .tab-link .close-tab:hover {
             opacity: 1;
         }
         
-        /* Tab navigation arrows */
-        .tab-nav-arrow {
+        /* Table tabs navigation arrows */
+        .table-nav-arrow {
             background: #e9ecef;
             border: none;
-            border-radius: 4px;
-            padding: 8px 12px;
+            border-radius: 3px;
+            padding: 6px 8px;
             cursor: pointer;
             color: #6c757d;
-            font-size: 1rem;
+            font-size: 0.875rem;
             transition: all 0.2s ease;
             flex-shrink: 0;
+            height: 28px;
+            width: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .tab-nav-arrow:hover {
+        .table-nav-arrow:hover {
             background: #dee2e6;
             color: #495057;
         }
         
-        .tab-nav-arrow:disabled {
+        .table-nav-arrow:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        
-        /* Close all button */
-        .close-all-tabs {
-            background: #dc3545;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 12px;
-            margin-left: 10px;
-            cursor: pointer;
-            color: white;
-            font-size: 0.875rem;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-        }
-        
-        .close-all-tabs:hover {
-            background: #c82333;
-        }
         .table-container {
             background: white;
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             width: 100%;
-            /* height: calc(100vh - 150px); Full height minus header */
             display: flex;
             flex-direction: column;
+            flex: 1;
         }
         .table-responsive {
             flex: 1; /* Take remaining space */
@@ -304,7 +381,7 @@ if (isset($_GET['logout'])) {
             width: 100%;
         }
         .table th {
-            background: #f8f9fa;
+            background: #F5F5F5;
             position: sticky;
             top: 0;
             z-index: 1;
@@ -336,8 +413,8 @@ if (isset($_GET['logout'])) {
             transform: translateY(-1px);
         }
         .database-selector {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 20px;
@@ -400,29 +477,166 @@ if (isset($_GET['logout'])) {
             margin-right: 400px;
         }
         
-                 .database-selector {
-             background: rgba(255, 255, 255, 0.05);
-             border-radius: 8px;
-             padding: 15px;
+                         .database-selector {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        /* Sidebar navigation items */
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: #666;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+        
+        .sidebar-nav-item:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #333;
+        }
+        
+        .sidebar-nav-item.active {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+        }
+        
+        .sidebar-nav-item i {
+            margin-right: 12px;
+            font-size: 1rem;
+            width: 20px;
+            text-align: center;
+        }
+        
+        
+        
+                 /* Projects section (for tables) */
+         .projects-header {
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             padding: 0 16px;
+             margin-bottom: 12px;
+             color: #666;
+             font-size: 0.75rem;
+             font-weight: 600;
+             text-transform: uppercase;
+             letter-spacing: 0.5px;
          }
+         
+         .project-item {
+             display: flex;
+             align-items: center;
+             padding: 8px 16px;
+             color: #333;
+             text-decoration: none;
+             border-radius: 4px;
+             margin-bottom: 2px;
+             transition: all 0.2s ease;
+             font-size: 0.875rem;
+         }
+         
+         .project-item:hover {
+             background: rgba(0, 0, 0, 0.1);
+         }
+         
+         .project-item.active {
+             background: rgba(0, 123, 255, 0.2);
+             color: #007bff;
+         }
+         
+         .project-item i {
+             margin-right: 8px;
+             font-size: 0.875rem;
+             width: 16px;
+             text-align: center;
+         }
+         
+         /* Add project button */
+         .add-project-btn {
+             display: flex;
+             align-items: center;
+             padding: 8px 16px;
+             color: #007bff;
+             background: none;
+             border: none;
+             border-radius: 4px;
+             margin: 8px 0;
+             transition: all 0.2s ease;
+             font-size: 0.875rem;
+             cursor: pointer;
+         }
+         
+         .add-project-btn:hover {
+             background: rgba(0, 123, 255, 0.1);
+         }
+         
+         .add-project-btn i {
+             margin-right: 8px;
+             font-size: 0.875rem;
+         }
+         
+         /* User profile */
+         .user-profile {
+             display: flex;
+             align-items: center;
+             padding: 12px 16px;
+             border-top: 1px solid rgba(0, 0, 0, 0.1);
+             margin-top: auto;
+         }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            margin-right: 12px;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 2px;
+        }
+        
+        .user-role {
+            font-size: 0.75rem;
+            color: #666;
+        }
          
          /* Table search styling */
          #tableSearch {
-             background: rgba(255, 255, 255, 0.1);
-             border: 1px solid rgba(255, 255, 255, 0.2);
-             color: white;
+             background: rgba(255, 255, 255, 0.8);
+             border: 1px solid rgba(0, 0, 0, 0.2);
+             color: #333;
              font-size: 0.875rem;
          }
          
          #tableSearch::placeholder {
-             color: rgba(255, 255, 255, 0.6);
+             color: rgba(0, 0, 0, 0.6);
          }
          
          #tableSearch:focus {
-             background: rgba(255, 255, 255, 0.15);
-             border-color: rgba(255, 255, 255, 0.3);
-             color: white;
-             box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.1);
+             background: rgba(255, 255, 255, 1);
+             border-color: rgba(0, 0, 0, 0.3);
+             color: #333;
+             box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
          }
          
          .table-item.hidden {
@@ -434,7 +648,7 @@ if (isset($_GET['logout'])) {
          }
          
          .table-btn:hover {
-             background: rgba(255, 255, 255, 0.2) !important;
+             background: rgba(0, 0, 0, 0.1) !important;
              transform: translateX(5px);
          }
     </style>
@@ -447,102 +661,129 @@ if (isset($_GET['logout'])) {
         </button>
         
         <!-- Sidebar -->
-        <div class="sidebar p-3">
-            <div class="d-flex align-items-center mb-4">
-                <i class="bi bi-database-fill text-primary me-2" style="font-size: 1.5rem;"></i>
-                <h5 class="mb-0">DB Manager</h5>
-            </div>
+        <div class="sidebar">
+            <!-- Logo -->
+            <div class="d-flex align-items-center p-3">
+                <div class="d-flex align-items-center">
+                    <span class="text-dark">TABULE DATABASE MANAGER</span>
+                </div>
+                <i class="bi bi-chevron-down text-muted ms-auto"></i>
+            </div>            
             
             <!-- Database Selector -->
-            <div class="database-selector">
-                <label class="form-label text-white mb-2">
-                    <i class="bi bi-database me-2"></i>Select Database
-                </label>
-                <select class="form-select form-select-sm" id="databaseSelect" onchange="selectDatabase(this.value)">
-                    <option value="">Choose database...</option>
-                    <?php foreach ($databases as $db): ?>
-                        <option value="<?php echo htmlspecialchars($db); ?>" 
-                                <?php echo ($db === $current_database) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($db); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-                
-                <?php if (!empty($current_database)): ?>
-                    <div class="mt-2">
-                        <small class="text-light">
-                            <i class="bi bi-check-circle me-1"></i>
-                            Connected to: <strong><?php echo htmlspecialchars($current_database); ?></strong>
-                        </small>
+            <div class="p-3">
+                <div class="database-selector">
+                    <label class="form-label text-dark mb-2">
+                        <i class="bi bi-database me-2"></i>Select Database
+                    </label>
+                    <select class="form-select form-select-sm" id="databaseSelect" onchange="selectDatabase(this.value)">
+                        <option value="">Choose database...</option>
+                        <?php foreach ($databases as $db): ?>
+                            <option value="<?php echo htmlspecialchars($db); ?>" 
+                                    <?php echo ($db === $current_database) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($db); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    
+                    <?php if (!empty($current_database)): ?>
+                        <div class="mt-2">
+                            <small class="text-dark">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Connected to: <strong><?php echo htmlspecialchars($current_database); ?></strong>
+                            </small>
+                        </div>
+                    <?php else: ?>
+                    <?php endif; ?>
+                    
+                    <div class="mt-3">
+                        <button class="btn btn-outline-dark btn-sm w-100" data-bs-toggle="modal" data-bs-target="#createDatabaseModal">
+                            <i class="bi bi-plus-circle me-2"></i>Create Database
+                        </button>
                     </div>
-                <?php endif; ?>
-                
-                <div class="mt-3">
-                    <button class="btn btn-outline-light btn-sm w-100" data-bs-toggle="modal" data-bs-target="#createDatabaseModal">
-                        <i class="bi bi-plus-circle me-2"></i>Create Database
-                    </button>
                 </div>
             </div>
 
-                         <!-- Tables Section -->
-             <?php if (!empty($current_database)): ?>
-                 <div class="tables-section">
-                     <div class="d-flex justify-content-between align-items-center mb-3">
-                         <h6 class="text-white mb-0">
-                             <i class="bi bi-table me-2"></i>Tables
-                         </h6>
-                         <small class="text-light"><?php echo count($tables); ?> tables</small>
-                     </div>
-                     
-                     <!-- Table Search -->
-                     <div class="mb-3">
-                         <input type="text" class="form-control form-control-sm" id="tableSearch" 
-                                placeholder="Search tables..." onkeyup="filterTables()">
-                     </div>
-                     
-                     <?php if (empty($tables)): ?>
-                         <p class="text-muted small">No tables found</p>
-                     <?php else: ?>
-                         <div class="table-list" id="tableList">
-                             <?php foreach ($tables as $table): ?>
-                                 <div class="table-item mb-2" data-table-name="<?php echo htmlspecialchars($table); ?>">
-                                     <button class="btn btn-outline-light btn-sm w-100 text-start table-btn" 
-                                             onclick="openTable('<?php echo htmlspecialchars($table); ?>')">
-                                         <i class="bi bi-table me-2"></i>
-                                         <span class="table-name"><?php echo htmlspecialchars($table); ?></span>
-                                     </button>
-                                 </div>
-                             <?php endforeach; ?>
-                         </div>
-                         
-                         <!-- No results message -->
-                         <div id="noTablesFound" class="text-muted small" style="display: none;">
-                             No tables match your search
-                         </div>
-                     <?php endif; ?>
-                     
-                     <hr class="my-3">
-                     <button class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" data-bs-target="#createTableModal">
-                         <i class="bi bi-plus-circle me-2"></i>Create Table
-                     </button>
-                 </div>
-             <?php endif; ?>
-
-            <hr class="my-3">
-
-            <div class="d-grid">
-                <a href="?logout=1" class="btn btn-outline-light btn-sm">
-                    <i class="bi bi-box-arrow-right me-2"></i>Logout
-                </a>
-            </div>
-        </div>
+                                                  <!-- Tables Section -->
+              <?php if (!empty($current_database)): ?>
+                  <div class="p-3">
+                      <div class="projects-header">
+                          <span>Tables (<?php echo count($tables); ?>)</span>
+                      </div>
+                      
+                      <!-- Table Search -->
+                      <div class="mb-3">
+                          <input type="text" class="form-control form-control-sm" id="tableSearch" 
+                                 placeholder="Search tables..." onkeyup="filterTables()">
+                      </div>
+                      
+                      <?php if (empty($tables)): ?>
+                          <p class="text-muted small px-3">No tables found</p>
+                      <?php else: ?>
+                          <div class="table-list" id="tableList">
+                              <?php foreach ($tables as $table): ?>
+                                  <div class="table-item" data-table-name="<?php echo htmlspecialchars($table); ?>">
+                                      <button class="project-item w-100 text-start table-btn" 
+                                              onclick="openTable('<?php echo htmlspecialchars($table); ?>')">
+                                          <i class="bi bi-table"></i>
+                                          <span class="table-name"><?php echo htmlspecialchars($table); ?></span>
+                                      </button>
+                                  </div>
+                              <?php endforeach; ?>
+                          </div>
+                          
+                          <!-- No results message -->
+                          <div id="noTablesFound" class="text-muted small px-3" style="display: none;">
+                              No tables match your search
+                          </div>
+                      <?php endif; ?>
+                      
+                      <button class="add-project-btn w-100" data-bs-toggle="modal" data-bs-target="#createTableModal">
+                          <i class="bi bi-plus-circle"></i>Create Table
+                      </button>
+                  </div>
+              <?php endif; ?>
+         </div>
 
         <!-- Main Content -->
-        <div class="main-content p-4">
-            <!-- Sidebar Toggle Button -->
-            <button class="btn btn-outline-secondary btn-sm mb-3" onclick="toggleSidebar()" id="sidebarToggle">
-                <i class="bi bi-list"></i> Toggle Sidebar
-            </button>
+        <div class="main-content">
+            <!-- Application Tabs -->
+            <div class="app-tabs">
+                <button class="app-tab active" onclick="switchAppTab('notebook')">
+                    <i class="bi bi-journal-text me-2"></i>Notebook
+                </button>
+                <button class="app-tab" onclick="switchAppTab('dashboard')">
+                    <i class="bi bi-graph-up me-2"></i>Dashboard
+                </button>
+                <button class="app-tab" onclick="switchAppTab('activate')">
+                    <i class="bi bi-play-circle me-2"></i>Activate
+                </button>
+                
+                <div class="action-buttons">
+                    <button class="action-btn primary" onclick="runAllQueries()">
+                        <i class="bi bi-play-fill me-1"></i>Run All
+                    </button>
+                    <button class="action-btn" onclick="toggleSQL()">
+                        <i class="bi bi-code-slash me-1"></i>Hide SQL
+                    </button>
+                    <button class="action-btn" onclick="shareQuery()">
+                        <i class="bi bi-share me-1"></i>Share
+                    </button>
+                    <button class="action-btn" onclick="scheduleQuery()">
+                        <i class="bi bi-clock me-1"></i>Schedule
+                    </button>
+                </div>
+            </div>
+            
+            <!-- SQL Query Display -->
+            <div class="sql-query-container" id="sqlQueryContainer">
+                <div class="sql-query">
+                    <span>SELECT * FROM</span>
+                    <select id="currentTableSelect" onchange="updateSQLQuery()">
+                        <option value="">Select table...</option>
+                    </select>
+                </div>
+            </div>
                     <?php if (isset($error_message)): ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
                             <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -566,34 +807,30 @@ if (isset($_GET['logout'])) {
                             <h3 class="mt-3 text-muted">Welcome to Database Manager</h3>
                             <p class="text-muted">Please select a database from the sidebar to get started.</p>
                         </div>
-                    <?php else: ?>
-                        <!-- Table Tabs -->
-                        <div id="tableTabsContainer" style="display: none;">
-                            <div class="tab-navigation">
-                                <button class="tab-nav-arrow" id="tabNavLeft" onclick="scrollTabs('left')" disabled>
-                                    <i class="bi bi-chevron-left"></i>
-                                </button>
-                                
-                                <div class="tab-scroll-container">
-                                    <div class="tab-scroll-wrapper" id="tabScrollWrapper">
-                                        <ul class="nav nav-tabs" id="tableTabs" role="tablist">
-                                            <!-- Tabs will be dynamically added here -->
-                                        </ul>
-                                    </div>
-                                </div>
-                                
-                                <button class="tab-nav-arrow" id="tabNavRight" onclick="scrollTabs('right')" disabled>
-                                    <i class="bi bi-chevron-right"></i>
-                                </button>
-                                
-                                <button class="close-all-tabs" onclick="closeAllTabs()" title="Close all tabs">
-                                    <i class="bi bi-x-circle me-1"></i>Close All
-                                </button>
-                            </div>
-                            <div class="tab-content" id="tableTabsContent">
-                                <!-- Tab content will be dynamically added here -->
-                            </div>
-                        </div>
+                                         <?php else: ?>
+                         <!-- Table Tabs -->
+                         <div id="tableTabsContainer" style="display: none;">
+                             <div class="table-tabs-navigation">
+                                 <button class="table-nav-arrow" id="tableNavLeft" onclick="scrollTableTabs('left')" disabled>
+                                     <i class="bi bi-chevron-left"></i>
+                                 </button>
+                                 
+                                 <div class="table-tabs-scroll">
+                                     <div class="table-tabs-wrapper" id="tableTabsWrapper">
+                                         <ul class="table-tabs" id="tableTabs" role="tablist">
+                                             <!-- Tabs will be dynamically added here -->
+                                         </ul>
+                                     </div>
+                                 </div>
+                                 
+                                 <button class="table-nav-arrow" id="tableNavRight" onclick="scrollTableTabs('right')" disabled>
+                                     <i class="bi bi-chevron-right"></i>
+                                 </button>
+                             </div>
+                             <div class="table-content" id="tableTabsContent">
+                                 <!-- Tab content will be dynamically added here -->
+                             </div>
+                         </div>
 
                          <!-- Welcome Message for Tables -->
                          <div id="tablesWelcomeView">
@@ -689,21 +926,41 @@ if (isset($_GET['logout'])) {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/dashboard.js" onerror="console.error('Failed to load dashboard.js')"></script>
-    <script>
-        // Debug: Check if functions are loaded
-        console.log('Dashboard.js loaded. Available functions:', {
-            selectDatabase: typeof selectDatabase,
-            openTable: typeof openTable,
-            closeTable: typeof closeTable,
-            toggleView: typeof toggleView,
-            refreshTable: typeof refreshTable,
-            addRow: typeof addRow,
-            editRow: typeof editRow,
-            deleteRow: typeof deleteRow,
-            closeEditSidebar: typeof closeEditSidebar
-        });
+         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+     <script src="js/dashboard.js" onerror="console.error('Failed to load dashboard.js')"></script>
+     <script>
+         // Debug: Check if functions are loaded
+         console.log('Dashboard.js loaded. Available functions:', {
+             selectDatabase: typeof selectDatabase,
+             openTable: typeof openTable,
+             closeTable: typeof closeTable,
+             toggleView: typeof toggleView,
+             refreshTable: typeof refreshTable,
+             addRow: typeof addRow,
+             editRow: typeof editRow,
+             deleteRow: typeof deleteRow,
+             closeEditSidebar: typeof closeEditSidebar,
+             filterTables: typeof filterTables,
+             clearTableSearch: typeof clearTableSearch
+         });
+         
+         // Test database selector
+         document.addEventListener('DOMContentLoaded', function() {
+             const dbSelect = document.getElementById('databaseSelect');
+             if (dbSelect) {
+                 console.log('Database select found:', dbSelect);
+                 dbSelect.addEventListener('change', function() {
+                     console.log('Database select changed to:', this.value);
+                     if (typeof selectDatabase === 'function') {
+                         selectDatabase(this.value);
+                     } else {
+                         console.error('selectDatabase function not found!');
+                     }
+                 });
+             } else {
+                 console.error('Database select element not found!');
+             }
+         });
         
         // Sidebar toggle functionality
         function toggleSidebar() {
@@ -750,39 +1007,9 @@ if (isset($_GET['logout'])) {
              }
          });
          
-         // Filter tables function
-         function filterTables() {
-             const searchTerm = document.getElementById('tableSearch').value.toLowerCase();
-             const tableItems = document.querySelectorAll('.table-item');
-             const noResults = document.getElementById('noTablesFound');
-             let visibleCount = 0;
-             
-             tableItems.forEach(item => {
-                 const tableName = item.getAttribute('data-table-name').toLowerCase();
-                 if (tableName.includes(searchTerm)) {
-                     item.classList.remove('hidden');
-                     visibleCount++;
-                 } else {
-                     item.classList.add('hidden');
-                 }
-             });
-             
-             // Show/hide no results message
-             if (visibleCount === 0 && searchTerm !== '') {
-                 noResults.style.display = 'block';
-             } else {
-                 noResults.style.display = 'none';
-             }
-         }
          
-         // Clear search when database changes
-         function clearTableSearch() {
-             const searchInput = document.getElementById('tableSearch');
-             if (searchInput) {
-                 searchInput.value = '';
-                 filterTables();
-             }
-         }
+          
+          
     </script>
 </body>
 </html>

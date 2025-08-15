@@ -23,26 +23,136 @@ function initializeEventListeners() {
     if (createTableForm) {
         createTableForm.addEventListener('submit', handleCreateTable);
     }
-    
+
     // Window resize handler for tab navigation
     window.addEventListener('resize', () => {
-        setTimeout(updateTabNavigation, 100);
+        setTimeout(updateTableTabNavigation, 100);
     });
+}
+
+// Tab navigation variables
+let tableTabScrollPosition = 0;
+
+// Update table tab navigation arrows
+function updateTableTabNavigation() {
+    const wrapper = document.getElementById('tableTabsWrapper');
+    const leftArrow = document.getElementById('tableNavLeft');
+    const rightArrow = document.getElementById('tableNavRight');
+    
+    if (!wrapper || !leftArrow || !rightArrow) return;
+    
+    const wrapperWidth = wrapper.offsetWidth;
+    const scrollWidth = wrapper.scrollWidth;
+    
+    // Enable/disable left arrow
+    if (tableTabScrollPosition <= 0) {
+        leftArrow.disabled = true;
+    } else {
+        leftArrow.disabled = false;
+    }
+    
+    // Enable/disable right arrow
+    if (tableTabScrollPosition >= scrollWidth - wrapperWidth) {
+        rightArrow.disabled = true;
+    } else {
+        rightArrow.disabled = false;
+    }
+}
+
+// Scroll table tabs left/right
+function scrollTableTabs(direction) {
+    const wrapper = document.getElementById('tableTabsWrapper');
+    if (!wrapper) return;
+    
+    const scrollAmount = 200;
+    
+    if (direction === 'left') {
+        tableTabScrollPosition = Math.max(0, tableTabScrollPosition - scrollAmount);
+    } else {
+        const maxScroll = wrapper.scrollWidth - wrapper.offsetWidth;
+        tableTabScrollPosition = Math.min(maxScroll, tableTabScrollPosition + scrollAmount);
+    }
+    
+    wrapper.style.transform = `translateX(-${tableTabScrollPosition}px)`;
+    updateTableTabNavigation();
+}
+
+// Application tab functions
+function switchAppTab(tabName) {
+    // Remove active from all app tabs
+    document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
+    
+    // Activate clicked tab
+    const clickedTab = document.querySelector(`[onclick="switchAppTab('${tabName}')"]`);
+    if (clickedTab) {
+        clickedTab.classList.add('active');
+    }
+    
+    // Handle different app tabs
+    switch(tabName) {
+        case 'notebook':
+            // Show notebook view (current table view)
+            break;
+        case 'dashboard':
+            showAlert('Dashboard view coming soon!', 'info');
+            break;
+        case 'activate':
+            showAlert('Activate view coming soon!', 'info');
+            break;
+    }
+}
+
+// Action button functions
+function runAllQueries() {
+    showAlert('Running all queries...', 'info');
+}
+
+function toggleSQL() {
+    const container = document.getElementById('sqlQueryContainer');
+    if (container) {
+        container.style.display = container.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function shareQuery() {
+    showAlert('Share functionality coming soon!', 'info');
+}
+
+function scheduleQuery() {
+    showAlert('Schedule functionality coming soon!', 'info');
+}
+
+// Update SQL query display
+function updateSQLQueryDisplay(tableName) {
+    const select = document.getElementById('currentTableSelect');
+    if (select && tableName) {
+        select.value = tableName;
+    }
+}
+
+// Update SQL query when table changes
+function updateSQLQuery() {
+    const select = document.getElementById('currentTableSelect');
+    if (select && select.value) {
+        openTable(select.value);
+    }
 }
 
 // Select database from dropdown
 function selectDatabase(dbName) {
-    if (!dbName) return;
+    console.log('selectDatabase called with:', dbName);
     
-    // Show loading state
-    const select = document.getElementById('databaseSelect');
-    const originalValue = select.value;
-    select.disabled = true;
+    // Handle empty selection (no database selected)
+    if (!dbName || dbName === '') {
+        console.log('Empty database selection, redirecting to clear...');
+        // Redirect to clear database selection
+        window.location.href = 'select_database.php?db=';
+        return;
+    }
     
-    // Clear table search before redirecting
-    clearTableSearch();
+    console.log('Selecting database:', dbName);
     
-    // Redirect to select database
+    // Use simple redirect to ensure session is properly updated
     window.location.href = `select_database.php?db=${encodeURIComponent(dbName)}`;
 }
 
@@ -103,9 +213,9 @@ function createTableTab(tableName, data) {
     
     // Create tab
     const tab = document.createElement('li');
-    tab.className = 'nav-item';
+    tab.className = 'tab-item';
     tab.innerHTML = `
-        <button class="nav-link" id="tab-${tableName}" data-bs-toggle="tab" data-bs-target="#content-${tableName}" type="button">
+        <button class="tab-link" id="tab-${tableName}" data-bs-toggle="tab" data-bs-target="#content-${tableName}" type="button">
             <i class="bi bi-table me-2"></i>${tableName}
             <span class="close-tab" onclick="closeTable('${tableName}', event)">×</span>
         </button>
@@ -119,8 +229,14 @@ function createTableTab(tableName, data) {
     content.innerHTML = createTableContent(tableName, data);
     contentContainer.appendChild(content);
     
-    // Update tab navigation arrows after adding new tab
-    setTimeout(updateTabNavigation, 100);
+    // Switch to this tab
+    switchToTab(tableName);
+    
+    // Update navigation arrows
+    updateTableTabNavigation();
+    
+    // Update SQL query
+    updateSQLQueryDisplay(tableName);
 }
 
 // Create table content HTML
@@ -206,7 +322,7 @@ function switchToTab(tableName) {
     const tab = document.getElementById(`tab-${tableName}`);
     if (tab) {
         // Remove active from all tabs
-        document.querySelectorAll('#tableTabs .nav-link').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#tableTabs .tab-link').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('#tableTabsContent .tab-pane').forEach(p => p.classList.remove('show', 'active'));
         
         // Activate this tab
@@ -219,6 +335,9 @@ function switchToTab(tableName) {
         // Close any open sidebars when switching tabs
         closeEditSidebar();
         closeAddRowSidebar();
+        
+        // Update SQL query display
+        updateSQLQueryDisplay(tableName);
     }
 }
 
@@ -241,14 +360,14 @@ function closeTable(tableName, event) {
         showWelcomeView();
     } else {
         // Switch to first available tab
-        const firstTab = document.querySelector('#tableTabs .nav-link');
+        const firstTab = document.querySelector('#tableTabs .tab-link');
         if (firstTab) {
             firstTab.click();
         }
     }
     
     // Update tab navigation after closing tab
-    setTimeout(updateTabNavigation, 100);
+    setTimeout(updateTableTabNavigation, 100);
 }
 
 // Show tabs view
@@ -1181,6 +1300,40 @@ function createEditRowModal(tableName, structure, currentData) {
     `;
 }
 
+// Filter tables function
+function filterTables() {
+    const searchTerm = document.getElementById('tableSearch').value.toLowerCase();
+    const tableItems = document.querySelectorAll('.table-item');
+    const noResults = document.getElementById('noTablesFound');
+    let visibleCount = 0;
+    
+    tableItems.forEach(item => {
+        const tableName = item.getAttribute('data-table-name').toLowerCase();
+        if (tableName.includes(searchTerm)) {
+            item.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+    
+    // Show/hide no results message
+    if (visibleCount === 0 && searchTerm !== '') {
+        noResults.style.display = 'block';
+    } else {
+        noResults.style.display = 'none';
+    }
+}
+
+// Clear search when database changes
+function clearTableSearch() {
+    const searchInput = document.getElementById('tableSearch');
+    if (searchInput) {
+        searchInput.value = '';
+        filterTables();
+    }
+}
+
 // Export functions for global access
 window.selectDatabase = selectDatabase;
 window.openTable = openTable;
@@ -1194,5 +1347,14 @@ window.editRow = editRow;
 window.deleteRow = deleteRow;
 window.closeEditSidebar = closeEditSidebar;
 window.closeAddRowSidebar = closeAddRowSidebar;
-window.scrollTabs = scrollTabs;
-window.closeAllTabs = closeAllTabs;
+window.scrollTableTabs = scrollTableTabs;
+window.updateTableTabNavigation = updateTableTabNavigation;
+window.switchAppTab = switchAppTab;
+window.runAllQueries = runAllQueries;
+window.toggleSQL = toggleSQL;
+window.shareQuery = shareQuery;
+window.scheduleQuery = scheduleQuery;
+window.updateSQLQuery = updateSQLQuery;
+window.updateSQLQueryDisplay = updateSQLQueryDisplay;
+window.filterTables = filterTables;
+window.clearTableSearch = clearTableSearch;

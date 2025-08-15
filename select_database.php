@@ -14,7 +14,9 @@ if (!isset($_SESSION['db_connected']) || $_SESSION['db_connected'] !== true) {
 // Get database name from URL parameter
 $dbName = $_GET['db'] ?? '';
 
+// If no database name provided, clear the selection
 if (empty($dbName)) {
+    $_SESSION['db_database'] = '';
     header('Location: dashboard.php');
     exit();
 }
